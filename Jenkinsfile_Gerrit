@@ -26,18 +26,17 @@ pipeline {
         stage("Checkout"){
             steps {
                 checkout scm
+                script {
+                    sshagent (credentials: ['jenkinsSSH']) {
+                        sh """git fetch --tags"""
+                    }
+                }
             }
         }
         stage("Setup"){
             steps {
                 script {
-                    OLD_VERSION = sh(script:"""git tag | sort -V | tail -1 | cat""", returnStdout: true)
-                    if(OLD_VERSION){
-                        versions = OLD_VERSION.split("\\.")
-                        VERSION = "${versions[0]}.${versions[1]}."+(Integer.parseInt(versions[2])+1)
-                    }else{
-                        VERSION="1.0.0"
-                    }
+                    VERSION = sh(script:"""git describe --tags""", returnStdout: true).trim()
                 }
                 sh """
                     sed -i "s/DEV-BUILD/$VERSION/" pom.xml
@@ -60,11 +59,12 @@ pipeline {
                 """
             }
         }
-        stage("Push Tag"){
+        stage("Deploy"){
             steps {
                 sh """
-                    git tag $VERSION
-                    git push --tags
+                    export VERSION=$VERSION
+                    docker-compose pull mysql
+                    docker stack deploy --compose-file docker-compose.yaml petclinic
                 """
             }
         }
