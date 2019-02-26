@@ -1,6 +1,7 @@
 #!/usr/bin/env groovy
 
 String VERSION = "1.0.0"
+String BRANCH = env.BRANCH
 
 pipeline {
     agent {
