@@ -43,10 +43,26 @@ pipeline {
                 """
             }
         }
+        stage("Build"){
+            steps {
+                retry(3) {
+                    sh """
+                        ./mvnw compile
+                    """
+                }
+            }
+        }
+        stage("Test"){
+            steps {
+                sh """
+                    ./mvnw test
+                """
+            }
+        }
         stage("Package"){
             steps {
                 sh """
-                    ./mvnw package
+                    ./mvnw package -DskipTests
                 """
             }
         }
@@ -64,7 +80,7 @@ pipeline {
                 sh """
                     export VERSION=$VERSION
                     docker-compose pull mysql
-                    docker stack deploy --compose-file docker-compose.yaml petclinic
+                    docker stack deploy --compose-file docker-compose.yml petclinic
                 """
             }
         }
