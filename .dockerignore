@@ -1,0 +1,16 @@
+# Ignore all of these files so that the docker daemon does not include them in docker builds.
+
+# Docker files
+/.dockerignore
+/Dockerfile
+
+/tmp/
+
+# Git data
+/.git/
+
+# Build artifacts
+/build/
+/target/
+*.jar
+*.class

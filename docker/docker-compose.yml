@@ -1,0 +1,22 @@
+version: "3.5"
+
+services:
+  app:
+    image: bauk/spring-petclinic
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    depends_on:
+      - mysql
+    ports:
+      - 8080:8080
+
+  mysql:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=petclinic
+      - MYSQL_DATABASE=petclinic
+    volumes:
+      - "./conf.d:/etc/mysql/conf.d:ro"
